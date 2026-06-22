@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#1a3a6e">
+<title>Admin — Khoa Nội 4</title>
+<style>
+/* ══════════════════════════════════════════════
+   CẤU HÌNH — chỉnh sửa trong JS bên dưới
+   ══════════════════════════════════════════════ */
+:root{
+  --pri:#1a3a6e;--pri2:#1d4ed8;--pri3:#0f2750;
+  --green:#059669;--red:#dc2626;--amb:#d97706;
+  --bg:#eef1f7;--card:#fff;--bd:#e2e8f0;
+  --t1:#0f172a;--t2:#475569;--t3:#94a3b8;
+  --r:12px;--sh:0 2px 12px rgba(15,23,42,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;}
+
+/* ── LOGIN OVERLAY ── */
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,var(--pri3),var(--pri));
+  display:flex;align-items:center;justify-content:center;z-index:999;padding:20px;}
+.login-box{background:#fff;border-radius:18px;padding:36px 32px;width:100%;max-width:360px;
+  box-shadow:0 20px 60px rgba(0,0,0,.25);}
+.login-logo{width:56px;height:56px;background:linear-gradient(135deg,var(--pri3),var(--pri2));
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:900;color:#fff;text-align:center;line-height:1.2;margin:0 auto 20px;}
+.login-title{text-align:center;font-size:18px;font-weight:800;color:var(--pri);margin-bottom:4px;}
+.login-sub{text-align:center;font-size:12px;color:var(--t3);margin-bottom:24px;}
+.login-field{margin-bottom:14px;}
+.login-field label{display:block;font-size:11px;font-weight:700;color:#64748b;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.login-input{width:100%;padding:11px 14px;border:1.5px solid var(--bd);border-radius:8px;font-size:14px;color:var(--t1);outline:none;transition:border-color .15s;}
+.login-input:focus{border-color:var(--pri2);}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--pri3),var(--pri2));
+  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;}
+.login-err{text-align:center;font-size:12px;color:var(--red);margin-top:8px;display:none;}
+
+/* ── HEADER ── */
+.hdr{background:linear-gradient(135deg,var(--pri3),var(--pri),var(--pri2));
+  color:#fff;padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;}
+.hdr-left{display:flex;align-items:center;gap:10px;}
+.hdr-logo{width:36px;height:36px;border-radius:9px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);
+  display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#fff;text-align:center;line-height:1.2;}
+.hdr-title{font-size:14px;font-weight:800;}
+.hdr-sub{font-size:10px;opacity:.65;margin-top:1px;}
+.hdr-right{display:flex;align-items:center;gap:8px;}
+.hdr-btn{padding:6px 13px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;border:none;}
+.hbtn-dash{background:#fff;color:var(--pri);}
+.hbtn-out{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.25);}
+
+/* ── TABS ── */
+.nav{background:#fff;border-bottom:1px solid var(--bd);padding:0 16px;
+  display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-tab{padding:14px 18px;border:none;background:transparent;font-size:12px;font-weight:600;
+  color:#64748b;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .15s;}
+.nav-tab.on{color:var(--pri);border-bottom-color:var(--pri);}
+
+/* ── CONTENT ── */
+.content{padding:16px;max-width:960px;margin:0 auto;}
+.tab-pane{display:none;}.tab-pane.on{display:block;}
+
+/* ── CARDS ── */
+.card{background:var(--card);border-radius:var(--r);padding:18px;box-shadow:var(--sh);margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:800;color:var(--pri);text-transform:uppercase;letter-spacing:.6px;
+  margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title::before{content:'';width:3px;height:14px;background:var(--pri2);border-radius:2px;display:block;flex-shrink:0;}
+
+/* ── FORM ── */
+.form-date{display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--bd);}
+.form-date label{font-size:11px;font-weight:700;color:#64748b;white-space:nowrap;}
+.date-input{padding:7px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;font-weight:600;color:var(--t1);cursor:pointer;outline:none;}
+.date-input:focus{border-color:var(--pri2);}
+.date-today{padding:5px 12px;background:#eff6ff;color:var(--pri2);border:1.5px solid #bfdbfe;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;}
+
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:4px;}
+.fgrid-2{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));}
+.fgroup{display:flex;flex-direction:column;gap:4px;}
+.fgroup label{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;}
+.finput{padding:8px 10px;border:1.5px solid var(--bd);border-radius:7px;font-size:14px;font-weight:600;
+  color:var(--t1);text-align:center;outline:none;transition:border-color .15s;width:100%;}
+.finput:focus{border-color:var(--pri2);background:#f8faff;}
+.finput.red:focus{border-color:var(--red);}
+.finput.amb:focus{border-color:var(--amb);}
+.finput.green:focus{border-color:var(--green);}
+.sub-title{font-size:10px;font-weight:700;color:#94a3b8;margin:12px 0 8px;text-transform:uppercase;letter-spacing:.5px;}
+
+/* BS grid */
+.bs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;}
+.bs-row{display:flex;align-items:center;gap:10px;background:#f8fafc;border-radius:8px;padding:8px 12px;}
+.bs-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;color:#fff;flex-shrink:0;}
+.bs-name{flex:1;font-size:11px;font-weight:600;color:var(--t2);}
+.bs-input{width:52px;padding:5px 6px;border:1.5px solid var(--bd);border-radius:6px;
+  font-size:14px;font-weight:700;text-align:center;color:var(--t1);outline:none;}
+.bs-input:focus{border-color:var(--pri2);}
+
+/* Submit button */
+.submit-row{display:flex;align-items:center;gap:10px;margin-top:4px;}
+.btn-save{display:flex;align-items:center;gap:7px;padding:11px 28px;
+  background:linear-gradient(135deg,var(--pri3),var(--pri2));color:#fff;
+  border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.btn-save:hover{opacity:.88;}.btn-save:disabled{opacity:.5;cursor:not-allowed;}
+.btn-save .spin{display:none;width:13px;height:13px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;}
+.btn-save.loading .spin{display:block;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.save-status{font-size:12px;color:var(--t3);}
+.save-status.ok{color:var(--green);font-weight:600;}
+.save-status.err{color:var(--red);font-weight:600;}
+
+/* History table */
+.tscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+table{width:100%;border-collapse:collapse;min-width:560px;font-size:12px;}
+thead th{padding:8px 10px;background:#f8fafc;font-size:10px;font-weight:700;color:var(--t3);
+  text-align:right;border-bottom:1px solid var(--bd);text-transform:uppercase;white-space:nowrap;}
+thead th:first-child{text-align:left;}
+tbody td{padding:9px 10px;border-bottom:1px solid #f8fafc;text-align:right;font-weight:500;}
+tbody td:first-child{text-align:left;font-weight:700;color:var(--t2);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#fafbfe;}
+.del-btn{padding:2px 8px;background:#fee2e2;color:#991b1b;border:none;border-radius:4px;
+  font-size:10px;font-weight:700;cursor:pointer;}
+
+/* Settings */
+.set-card{margin-bottom:14px;}
+.set-field{margin-bottom:12px;}
+.set-field label{display:block;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;}
+.set-input{width:100%;padding:8px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:12px;color:var(--t1);outline:none;}
+.set-input:focus{border-color:var(--pri2);}
+.set-hint{font-size:10px;color:var(--t3);margin-top:5px;line-height:1.6;}
+.set-hint code{background:#f1f5f9;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:10px;}
+.btn-set{padding:7px 16px;background:var(--pri);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;margin-top:4px;}
+.apps-script-box{background:#f8fafc;border:1.5px solid var(--bd);border-radius:8px;padding:12px;margin-top:8px;}
+.apps-script-box pre{font-size:10px;color:#475569;font-family:monospace;white-space:pre-wrap;line-height:1.6;}
+.copy-code-btn{margin-top:8px;padding:4px 12px;background:#e0e7ff;color:var(--pri);border:none;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;}
+
+/* Toast */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--pri);color:#fff;padding:11px 20px;border-radius:10px;
+  font-size:12px;font-weight:600;box-shadow:0 8px 24px rgba(15,23,42,.2);z-index:500;
+  animation:tIn .2s ease;white-space:nowrap;}
+@keyframes tIn{from{opacity:0;transform:translateX(-50%) translateY(8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+@media(max-width:600px){
+  .hdr{padding:0 13px;height:50px;}
+  .hbtn-dash span{display:none;}
+  .content{padding:11px;}
+  .card{padding:14px;}
+  .fgrid{grid-template-columns:repeat(auto-fill,minmax(110px,1fr));}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="loginOv">
+  <div class="login-box">
+    <div class="login-logo">NỘI<br>4</div>
+    <div class="login-title">Admin — Nhập liệu</div>
+    <div class="login-sub">Khoa Nội 4 · BV Ung Bướu Đà Nẵng</div>
+    <div class="login-field">
+      <label>Mật khẩu</label>
+      <input class="login-input" id="passIn" type="password" placeholder="Nhập mật khẩu..." onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Đăng nhập</button>
+    <div class="login-err" id="loginErr">Mật khẩu không đúng</div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-left">
+    <div class="hdr-logo">NỘI<br>4</div>
+    <div>
+      <div class="hdr-title">Admin · Nhập liệu</div>
+      <div class="hdr-sub">Khoa Nội 4 · BV Ung Bướu Đà Nẵng</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <button class="hdr-btn hbtn-dash" onclick="window.location='dashboard.html'">
+      <span>← Dashboard</span>
+    </button>
+    <button class="hdr-btn hbtn-out" onclick="doLogout()">Đăng xuất</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="nav">
+  <button class="nav-tab on" onclick="switchTab('daily',this)">Nhập hàng ngày</button>
+  <button class="nav-tab" onclick="switchTab('monthly',this)">Hàng tháng</button>
+  <button class="nav-tab" onclick="switchTab('history',this)">Lịch sử</button>
+  <button class="nav-tab" onclick="switchTab('settings',this)">Cài đặt & Đồng bộ</button>
+</div>
+
+<div class="content">
+
+  <!-- ── TAB: NHẬP HÀNG NGÀY ── -->
+  <div class="tab-pane on" id="tab-daily">
+
+    <!-- Date picker -->
+    <div class="card">
+      <div class="form-date">
+        <label>Ngày nhập liệu:</label>
+        <input type="date" class="date-input" id="entryDate">
+        <button class="date-today" onclick="setToday()">Hôm nay</button>
+      </div>
+
+      <!-- NỘI TRÚ: NHẬP / RA -->
+      <div class="card-title">Nội trú — Nhập / Ra viện</div>
+      <div class="fgrid">
+        <div class="fgroup"><label>Nhập viện</label><input class="finput" id="f-nv" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Theo hẹn</label><input class="finput" id="f-hen" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Lần đầu</label><input class="finput" id="f-ld" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Ra viện</label><input class="finput" id="f-rv" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Xin về nặng</label><input class="finput amb" id="f-xv" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Tử vong</label><input class="finput red" id="f-tv" type="number" min="0" value="0"></div>
+      </div>
+
+      <div class="sub-title">Tình trạng giường (cuối ngày)</div>
+      <div class="fgrid">
+        <div class="fgroup"><label>Đang điều trị</label><input class="finput green" id="f-dang" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Giường thường</label><input class="finput" id="f-gt" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Giường y/cầu</label><input class="finput" id="f-gyc" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Giường xếp</label><input class="finput amb" id="f-gx" type="number" min="0" value="0"></div>
+      </div>
+    </div>
+
+    <!-- PHÒNG KHÁM -->
+    <div class="card">
+      <div class="card-title">Phòng khám</div>
+      <div class="fgrid">
+        <div class="fgroup"><label>BS ngồi khám</label><input class="finput" id="f-sobs" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Tổng BN khám</label><input class="finput green" id="f-bn" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Điều trị ngoại trú</label><input class="finput" id="f-ntou" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Nhập viện từ PK</label><input class="finput amb" id="f-nvpk" type="number" min="0" value="0"></div>
+      </div>
+    </div>
+
+    <!-- TẢI TRỌNG BÁC SĨ -->
+    <div class="card">
+      <div class="card-title">Tải trọng bác sĩ (số BN đang quản lý)</div>
+      <div class="bs-grid" id="bsGrid"></div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-save" id="btnSaveDaily" onclick="saveDaily()">
+        <div class="spin"></div>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        Lưu dữ liệu
+      </button>
+      <span class="save-status" id="statusDaily"></span>
+    </div>
+  </div>
+
+  <!-- ── TAB: HÀNG THÁNG ── -->
+  <div class="tab-pane" id="tab-monthly">
+    <div class="card">
+      <div class="card-title">Phân bố bệnh ung thư</div>
+      <div class="fgrid fgrid-2" style="margin-bottom:14px">
+        <div class="fgroup"><label>Tháng</label>
+          <select class="finput" id="m-thang" style="font-size:12px;text-align:left;padding:8px">
+            <option>1</option><option>2</option><option>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8</option>
+            <option>9</option><option>10</option><option>11</option><option>12</option>
+          </select>
+        </div>
+        <div class="fgroup"><label>Năm</label><input class="finput" id="m-nam" type="number" min="2020" max="2099"></div>
+      </div>
+      <div class="fgrid">
+        <div class="fgroup"><label>Ung thư phổi</label><input class="finput" id="m-phoi" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Ung thư vú</label><input class="finput" id="m-vu" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Đại trực tràng</label><input class="finput" id="m-dtrt" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Ung thư dạ dày</label><input class="finput" id="m-daday" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Ung thư gan</label><input class="finput" id="m-gan" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>U lympho</label><input class="finput" id="m-lympho" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Ung thư tụy</label><input class="finput" id="m-tuy" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Khác</label><input class="finput" id="m-khac" type="number" min="0" value="0"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Phân bố phác đồ điều trị</div>
+      <div class="fgrid">
+        <div class="fgroup"><label>Hóa chất</label><input class="finput" id="m-hc" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Điều trị đích</label><input class="finput" id="m-dtd" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Miễn dịch</label><input class="finput" id="m-md" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>CSGN cuối đời</label><input class="finput" id="m-csgn" type="number" min="0" value="0"></div>
+        <div class="fgroup"><label>Phối hợp</label><input class="finput" id="m-ph" type="number" min="0" value="0"></div>
+      </div>
+    </div>
+
+    <div class="submit-row">
+      <button class="btn-save" id="btnSaveMonthly" onclick="saveMonthly()">
+        <div class="spin"></div>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        Lưu tháng này
+      </button>
+      <span class="save-status" id="statusMonthly"></span>
+    </div>
+  </div>
+
+  <!-- ── TAB: LỊCH SỬ ── -->
+  <div class="tab-pane" id="tab-history">
+    <div class="card">
+      <div class="card-title">Nội trú — 14 ngày gần nhất</div>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Ngày</th><th>NV</th><th>RV</th><th>TV</th><th>Đang</th><th>Xếp</th><th></th></tr></thead>
+          <tbody id="histNT"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Phòng khám — 14 ngày gần nhất</div>
+      <div class="tscroll">
+        <table>
+          <thead><tr><th>Ngày</th><th>BS</th><th>BN</th><th>Ngoại trú</th><th>NV từ PK</th><th></th></tr></thead>
+          <tbody id="histPK"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: CÀI ĐẶT ── -->
+  <div class="tab-pane" id="tab-settings">
+    <div class="card set-card">
+      <div class="card-title">Đồng bộ Google Sheets (tùy chọn)</div>
+      <div class="set-field">
+        <label>URL Google Apps Script Web App</label>
+        <input class="set-input" id="setGasUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec">
+        <div class="set-hint">Khi cài đặt URL này, mỗi lần nhấn "Lưu dữ liệu" sẽ tự động gửi lên Google Sheets, giúp đồng bộ giữa các thiết bị và dashboard đọc được.</div>
+        <button class="btn-set" onclick="saveGasUrl()">Lưu URL</button>
+      </div>
+
+      <div class="sub-title" style="margin-top:16px">Cách tạo Google Apps Script</div>
+      <div class="set-hint" style="margin-bottom:8px">
+        1. Vào <b>script.google.com</b> → New project<br>
+        2. Xóa code mặc định, paste code bên dưới vào<br>
+        3. Sửa <code>SHEET_ID</code> thành ID của Google Sheets của bạn<br>
+        4. Deploy → New deployment → Web App → Execute as: Me → Who has access: Anyone → Deploy<br>
+        5. Copy URL và dán vào ô trên
+      </div>
+      <div class="apps-script-box">
+        <pre id="gasCode"></pre>
+        <button class="copy-code-btn" onclick="copyGasCode()">Sao chép code</button>
+      </div>
+    </div>
+
+    <div class="card set-card">
+      <div class="card-title">Thông tin</div>
+      <div class="set-hint" style="font-size:11px;line-height:2">
+        <b>Mật khẩu admin:</b> Chỉnh sửa hằng số <code>ADMIN_PASS</code> trong file admin.html<br>
+        <b>Dữ liệu cục bộ:</b> Lưu trong localStorage của trình duyệt này, cùng key với dashboard<br>
+        <b>Dashboard URL:</b> <span id="dashUrl"></span><br>
+        <b>Admin URL:</b> <span id="adminUrl"></span>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-set" style="background:#dc2626" onclick="confirmClear()">Xóa toàn bộ dữ liệu cục bộ</button>
+        <button class="btn-set" style="background:#059669" onclick="exportAll()">Xuất CSV (tất cả)</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<script>
+// ════════════════════════════════════════════════════════════
+// CẤU HÌNH — chỉnh sửa tại đây
+const ADMIN_PASS = 'noitu4';   // Mật khẩu đăng nhập trang admin
+const LS_KEY     = 'noitu4_v4'; // Phải giống với dashboard.html
+// ════════════════════════════════════════════════════════════
+
+const BS_LIST = [
+  {key:'NguyenTuanAnh',     name:'BS Nguyễn Tuấn Anh',     ab:'NTA', c:'#2563eb'},
+  {key:'PhanDinhLinh',      name:'BS Phan Đình Linh',       ab:'PDL', c:'#059669'},
+  {key:'NguyenCongTam',     name:'BS Nguyễn Công Tâm',      ab:'NCT', c:'#7c3aed'},
+  {key:'NguyenThiThanhNga', name:'BS Nguyễn Thị Thanh Nga', ab:'NGA', c:'#dc2626'},
+  {key:'TonThatTuan',       name:'BS Tôn Thất Tuấn',        ab:'TTT', c:'#d97706'},
+  {key:'NguyenThiThu',      name:'BS Nguyễn Thị Thu',       ab:'NTH', c:'#0891b2'},
+];
+
+const fmt = d => (d instanceof Date ? d : new Date(d)).toISOString().split('T')[0];
+
+// ── AUTH ──────────────────────────────────────────────────────
+function doLogin(){
+  const v = document.getElementById('passIn').value;
+  if(v === ADMIN_PASS){
+    sessionStorage.setItem('admin_auth','1');
+    document.getElementById('loginOv').style.display='none';
+  } else {
+    document.getElementById('loginErr').style.display='block';
+    document.getElementById('passIn').value='';
+    document.getElementById('passIn').focus();
+  }
+}
+function doLogout(){sessionStorage.removeItem('admin_auth');location.reload();}
+
+// ── DATA ──────────────────────────────────────────────────────
+function loadD(){
+  try{const s=localStorage.getItem(LS_KEY);if(s){const d=JSON.parse(s);if(d?.nt)return d;}}catch(e){}
+  return{nt:[],pk:[],bs:[],benh:[],dtr:[],src:'csv',sheetUrls:{}};
+}
+function saveD(D){localStorage.setItem(LS_KEY,JSON.stringify(D));}
+
+function upsert(arr,rec,keys=['ngay']){
+  const idx=arr.findIndex(r=>keys.every(k=>String(r[k])===String(rec[k])));
+  if(idx>=0)arr[idx]=rec;else{arr.push(rec);arr.sort((a,b)=>(a.ngay||'').localeCompare(b.ngay||''));}
+}
+
+// ── INIT UI ───────────────────────────────────────────────────
+function initBS(){
+  document.getElementById('bsGrid').innerHTML=BS_LIST.map(d=>`
+    <div class="bs-row">
+      <div class="bs-dot" style="background:${d.c}">${d.ab}</div>
+      <span class="bs-name">${d.name}</span>
+      <input class="bs-input" id="bs-${d.key}" type="number" min="0" value="0">
+    </div>`).join('');
+}
+
+function setToday(){
+  document.getElementById('entryDate').value=fmt(new Date());
+  loadExistingDay();
+}
+
+function loadExistingDay(){
+  const ngay=document.getElementById('entryDate').value;
+  if(!ngay)return;
+  const D=loadD();
+  // Load NT
+  const nt=D.nt?.find(r=>r.ngay===ngay);
+  if(nt){
+    ['nv','hen','ld','rv','xv','tv','dang','gt','gyc','gx'].forEach(k=>{
+      const el=document.getElementById('f-'+k);if(el)el.value=nt[k]??0;
+    });
+  } else {
+    ['nv','hen','ld','rv','xv','tv','dang','gt','gyc','gx'].forEach(k=>{
+      const el=document.getElementById('f-'+k);if(el)el.value=0;
+    });
+  }
+  // Load PK
+  const pk=D.pk?.find(r=>r.ngay===ngay);
+  if(pk){
+    ['sobs','bn','ntou','nvpk'].forEach(k=>{
+      const el=document.getElementById('f-'+k);if(el)el.value=pk[k]??0;
+    });
+  } else {
+    ['sobs','bn','ntou','nvpk'].forEach(k=>{
+      const el=document.getElementById('f-'+k);if(el)el.value=0;
+    });
+  }
+  // Load BS
+  const bs=D.bs?.find(r=>r.ngay===ngay);
+  BS_LIST.forEach(d=>{
+    const el=document.getElementById('bs-'+d.key);
+    if(el)el.value=bs?+bs[d.key]||0:0;
+  });
+}
+
+function initMonthly(){
+  const now=new Date();
+  document.getElementById('m-nam').value=now.getFullYear();
+  document.getElementById('m-thang').value=now.getMonth()+1;
+  document.getElementById('m-thang').selectedIndex=now.getMonth();
+}
+
+// ── SAVE DAILY ────────────────────────────────────────────────
+async function saveDaily(){
+  const ngay=document.getElementById('entryDate').value;
+  if(!ngay){showToast('Chưa chọn ngày');return;}
+  const btn=document.getElementById('btnSaveDaily');
+  btn.classList.add('loading');btn.disabled=true;
+
+  const g=id=>+document.getElementById(id)?.value||0;
+
+  const ntRec={ngay,nv:g('f-nv'),hen:g('f-hen'),ld:g('f-ld'),rv:g('f-rv'),
+    xv:g('f-xv'),tv:g('f-tv'),dang:g('f-dang'),gt:g('f-gt'),gyc:g('f-gyc'),gx:g('f-gx')};
+  const pkRec={ngay,sobs:g('f-sobs'),bn:g('f-bn'),ntou:g('f-ntou'),nvpk:g('f-nvpk')};
+  const bsRec={ngay};
+  BS_LIST.forEach(d=>bsRec[d.key]=+document.getElementById('bs-'+d.key)?.value||0);
+
+  const D=loadD();
+  upsert(D.nt,ntRec);upsert(D.pk,pkRec);upsert(D.bs,bsRec);
+  D.src='csv';saveD(D);
+
+  // Gửi lên Google Sheets (nếu có URL)
+  const gasUrl=localStorage.getItem('gasUrl')||'';
+  let syncOk=true;
+  if(gasUrl){
+    try{
+      const rows=[
+        {type:'nt',row:[ngay,ntRec.nv,ntRec.hen,ntRec.ld,ntRec.rv,ntRec.xv,ntRec.tv,ntRec.dang,ntRec.gt,ntRec.gyc,ntRec.gx]},
+        {type:'pk',row:[ngay,pkRec.sobs,pkRec.bn,pkRec.ntou,pkRec.nvpk]},
+        {type:'bs',row:[ngay,...BS_LIST.map(d=>bsRec[d.key])]},
+      ];
+      await Promise.all(rows.map(r=>fetch(gasUrl,{method:'POST',body:JSON.stringify(r)}).then(x=>{if(!x.ok)throw new Error('HTTP '+x.status);})));
+    }catch(e){syncOk=false;showToast('Lưu cục bộ OK — Lỗi đồng bộ Sheets: '+e.message,4000);}
+  }
+
+  btn.classList.remove('loading');btn.disabled=false;
+  const st=document.getElementById('statusDaily');
+  st.textContent=syncOk?(gasUrl?'Đã lưu và đồng bộ Sheets ✓':'Đã lưu cục bộ ✓'):'Lưu cục bộ ✓ (Sheets lỗi)';
+  st.className='save-status ok';
+  setTimeout(()=>{st.textContent='';st.className='save-status';},4000);
+  renderHistory();
+  if(syncOk&&!gasUrl)showToast('Đã lưu: '+ngay);
+}
+
+// ── SAVE MONTHLY ──────────────────────────────────────────────
+async function saveMonthly(){
+  const nam=+document.getElementById('m-nam').value;
+  const thang=+document.getElementById('m-thang').value;
+  if(!nam||!thang){showToast('Chưa chọn tháng/năm');return;}
+  const btn=document.getElementById('btnSaveMonthly');
+  btn.classList.add('loading');btn.disabled=true;
+
+  const g=id=>+document.getElementById(id)?.value||0;
+  const benhRec={nam,thang,phoi:g('m-phoi'),vu:g('m-vu'),dtrtrang:g('m-dtrt'),
+    daday:g('m-daday'),gan:g('m-gan'),lympho:g('m-lympho'),tuy:g('m-tuy'),khac:g('m-khac')};
+  const dtrRec={nam,thang,hc:g('m-hc'),dtd:g('m-dtd'),md:g('m-md'),csgn:g('m-csgn'),ph:g('m-ph')};
+
+  const D=loadD();
+  upsert(D.benh,benhRec,['nam','thang']);
+  upsert(D.dtr,dtrRec,['nam','thang']);
+  D.src='csv';saveD(D);
+
+  // Gửi lên Sheets
+  const gasUrl=localStorage.getItem('gasUrl')||'';
+  let syncOk=true;
+  if(gasUrl){
+    try{
+      await Promise.all([
+        {type:'benh',row:[nam,thang,benhRec.phoi,benhRec.vu,benhRec.dtrtrang,benhRec.daday,benhRec.gan,benhRec.lympho,benhRec.tuy,benhRec.khac]},
+        {type:'dtr', row:[nam,thang,dtrRec.hc,dtrRec.dtd,dtrRec.md,dtrRec.csgn,dtrRec.ph]},
+      ].map(r=>fetch(gasUrl,{method:'POST',body:JSON.stringify(r)}).then(x=>{if(!x.ok)throw new Error('');})));
+    }catch(e){syncOk=false;}
+  }
+
+  btn.classList.remove('loading');btn.disabled=false;
+  const st=document.getElementById('statusMonthly');
+  st.textContent=syncOk?(gasUrl?'Đã lưu và đồng bộ Sheets ✓':'Đã lưu cục bộ ✓'):'Lưu cục bộ ✓ (Sheets lỗi)';
+  st.className='save-status ok';
+  setTimeout(()=>{st.textContent='';st.className='save-status';},4000);
+}
+
+// ── HISTORY ───────────────────────────────────────────────────
+function renderHistory(){
+  const D=loadD();
+  const nt14=[...D.nt].slice(-14).reverse();
+  const pk14=[...D.pk].slice(-14).reverse();
+  const fmtD=s=>{const d=new Date(s+'T00:00:00');return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear();};
+
+  document.getElementById('histNT').innerHTML=nt14.map(r=>`<tr>
+    <td>${fmtD(r.ngay)}</td><td>${r.nv}</td><td>${r.rv}</td>
+    <td style="color:#b91c1c">${r.tv}</td><td style="color:#0e7490">${r.dang}</td>
+    <td style="color:#d97706">${r.gx}</td>
+    <td><button class="del-btn" onclick="delRow('nt','${r.ngay}')">Xóa</button></td>
+  </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:20px">Chưa có dữ liệu</td></tr>';
+
+  document.getElementById('histPK').innerHTML=pk14.map(r=>`<tr>
+    <td>${fmtD(r.ngay)}</td><td>${r.sobs}</td><td>${r.bn}</td>
+    <td>${r.ntou}</td><td style="color:#d97706">${r.nvpk}</td>
+    <td><button class="del-btn" onclick="delRow('pk','${r.ngay}')">Xóa</button></td>
+  </tr>`).join('')||'<tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:20px">Chưa có dữ liệu</td></tr>';
+}
+
+function delRow(type,ngay){
+  if(!confirm(`Xóa dữ liệu ngày ${ngay}?`))return;
+  const D=loadD();
+  D[type]=D[type].filter(r=>r.ngay!==ngay);
+  if(type==='nt')D.bs=D.bs.filter(r=>r.ngay!==ngay);
+  saveD(D);renderHistory();showToast('Đã xóa: '+ngay);
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────
+function saveGasUrl(){
+  const url=document.getElementById('setGasUrl').value.trim();
+  localStorage.setItem('gasUrl',url);
+  showToast(url?'Đã lưu URL đồng bộ':'Đã xóa URL đồng bộ');
+}
+
+function confirmClear(){
+  if(!confirm('Xóa TOÀN BỘ dữ liệu cục bộ? Không thể hoàn tác!'))return;
+  localStorage.removeItem(LS_KEY);showToast('Đã xóa dữ liệu cục bộ');
+}
+
+function exportAll(){
+  const D=loadD();
+  const toCSV=(arr,hdrs)=>[hdrs.join(','),...arr.map(r=>hdrs.map(h=>r[h]??'').join(','))].join('\n');
+  const ntHdr=['ngay','nv','hen','ld','rv','xv','tv','dang','gt','gyc','gx'];
+  const pkHdr=['ngay','sobs','bn','ntou','nvpk'];
+  const bsHdr=['ngay',...BS_LIST.map(d=>d.key)];
+  const csv='=== NT_noi_tru ===\n'+toCSV(D.nt,ntHdr)+'\n\n=== PK_phong_kham ===\n'+toCSV(D.pk,pkHdr)+'\n\n=== BS_tai_trong ===\n'+toCSV(D.bs,bsHdr);
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='NoiTu4_export_'+fmt(new Date())+'.csv';a.click();
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(e=>e.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('on');
+  document.querySelectorAll('.nav-tab').forEach(e=>e.classList.remove('on'));
+  btn.classList.add('on');
+  if(id==='history')renderHistory();
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg,dur=2500){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300);},dur);
+}
+
+function copyGasCode(){
+  navigator.clipboard?.writeText(document.getElementById('gasCode').textContent)
+    .then(()=>showToast('Đã sao chép code Google Apps Script'));
+}
+function copyResult(){
+  navigator.clipboard?.writeText(document.getElementById('gasCode').textContent);
+}
+
+// ── GAS CODE TEMPLATE ─────────────────────────────────────────
+const GAS_CODE=`// Google Apps Script — Khoa Nội 4 Sync
+// Sửa SHEET_ID thành ID của Google Sheets của bạn
+const SHEET_ID = 'PASTE_YOUR_SPREADSHEET_ID_HERE';
+const TABS = {
+  nt:   'NT_noi_tru',
+  pk:   'PK_phong_kham',
+  bs:   'BS_tai_trong',
+  benh: 'PhanBo_Benh',
+  dtr:  'PhanBo_DieuTri'
+};
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss   = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(TABS[data.type]);
+    if (!sheet) throw new Error('Sheet not found: ' + data.type);
+    const last = sheet.getLastRow();
+    if (last > 1) {
+      const vals = sheet.getRange(2,1,last-1,1).getValues().flat();
+      const key  = String(data.row[0]);
+      const key2 = data.row[1] !== undefined ? String(data.row[1]) : null;
+      for (let i=0;i<vals.length;i++) {
+        const match = key2
+          ? String(vals[i])===key && String(sheet.getRange(i+2,2).getValue())===key2
+          : String(vals[i])===key;
+        if (match) {
+          sheet.getRange(i+2,1,1,data.row.length).setValues([data.row]);
+          return ok();
+        }
+      }
+    }
+    sheet.appendRow(data.row);
+    return ok();
+  } catch(e2) {
+    return ContentService.createTextOutput(JSON.stringify({error:e2.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+function doGet() { return ContentService.createTextOutput('OK'); }
+function ok() {
+  return ContentService.createTextOutput(JSON.stringify({ok:true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}`;
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  // Auth check
+  if(sessionStorage.getItem('admin_auth')!=='1'){
+    document.getElementById('loginOv').style.display='flex';
+    setTimeout(()=>document.getElementById('passIn').focus(),100);
+  } else {
+    document.getElementById('loginOv').style.display='none';
+  }
+
+  // Setup
+  initBS();
+  setToday();
+  initMonthly();
+
+  // Date change listener
+  document.getElementById('entryDate').addEventListener('change',loadExistingDay);
+
+  // GAS URL restore
+  const gasUrl=localStorage.getItem('gasUrl')||'';
+  if(gasUrl)document.getElementById('setGasUrl').value=gasUrl;
+
+  // GAS code display
+  document.getElementById('gasCode').textContent=GAS_CODE;
+
+  // Info URLs
+  document.getElementById('dashUrl').textContent=location.href.replace('admin.html','dashboard.html').replace('/admin','/');
+  document.getElementById('adminUrl').textContent=location.href;
+});
+</script>
+</body>
+</html>
